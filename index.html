@@ -1,0 +1,23 @@
+<! --HTTP/1.1 200 OK
+Content-Type: text/html
+Connection: close
+-->
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Interfaz Web - Microprocesadores</title>
+    </head>
+    <body>
+        <h1>Datos del sensor</h1>
+        <p>El valor del sensor de velocidad es: <span id='velocidad'>Esperando datos...</span></p>
+        <script>
+            function actualizarDatos() {
+                fetch('/datos')
+                    .then(response => response.text())
+                    .then(velocidad => document.getElementById('velocidad').innerText = velocidad);
+            }
+            setInterval(actualizarDatos, 1000);
+        </script>
+    </body>
+</html>
