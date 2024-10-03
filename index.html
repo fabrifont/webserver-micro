@@ -1,16 +1,36 @@
-<! --HTTP/1.1 200 OK
-Content-Type: text/html
-Connection: close
--->
 
 <!DOCTYPE HTML>
 <html>
     <head>
         <title>Interfaz Web - Microprocesadores</title>
+        <style>
+            body {
+                font-family: 'Trebuchet MS';
+                height: 100%; /* El cuerpo y html deben ocupar toda la altura */
+                margin: 0;
+                display: flex;
+                justify-content: center; /* Centrar horizontalmente */
+                align-items: center;
+            }
+            .bloque {
+                background-color: lightblue; /* Fondo de color azul claro */
+                color: black;               /* Texto en color blanco */
+                font-size: 20px;            /* Tamaño de fuente de 20px */
+                border-radius: 5px;         /* Bordes redondeados */
+                width: 50%;
+                height: 50%;
+                top: 50%;
+                left: 50%;
+                text-align: center;
+                padding: 20px;
+            }
+        </style>
     </head>
     <body>
-        <h1>Datos del sensor</h1>
-        <p>El valor del sensor de velocidad es: <span id='velocidad'>Esperando datos...</span></p>
+        <div class="bloque"><h1>Datos del sensor</h1>
+            <p>El valor del sensor de velocidad es:<br>
+                <span id='velocidad'>Esperando datos...</span></p>
+        </div>
         <script>
             function actualizarDatos() {
                 fetch('/datos')
