@@ -1,16 +1,16 @@
 #include <Ethernet.h>
 #include <SPI.h>
 #include <SD.h>
-//#include <Arduino.h>
-//#include <map>
 
-//std::map<String, int*> lista_variables;
+void enviarPaginaHTML();
+void enviarDatosSensor();
 
 struct mapita{
     String nombre;
     int* valor;
   };
 
+String request = "";  // Variable para almacenar la solicitud
 
 bool leer_datos = 0;
 bool datos_legibles = 0;
@@ -49,14 +49,11 @@ void setup() {
 
 void loop() {
   EthernetClient cliente = servidor.available();  // Captura el cliente conectado
-  
+  Serial.println("estamos en el loop");
   if (cliente) {  // Si hay un cliente conectado
     Serial.println("\nNuevo cliente conectado\n");
-    
-    String request = "";  // Variable para almacenar la solicitud
-    pagina_enviada = 0;
+    request = "";
     while (cliente.connected()) {  // Mientras el cliente esté conectado
-      
       /*if(datos_legibles){ //algoritmo de lectura e interpretacion de datos desde la solicitud HTTP POST del ESP32
         for(int i = 0; datos[i] != 0; i++) {
             if(datos[i] == '"'){
@@ -93,38 +90,50 @@ void loop() {
       if (cliente.available()) {  // Si hay datos disponibles del cliente
         char c = cliente.read();  // Lee un byte de datos
         request += c;  // Añade el carácter a la solicitud
-        //Serial.print(c);
-        /*if(c == "}") leer_datos = 0; datos_legibles = 1; //comienza a tomar datos cuando detecta un {, deja de leer cuando detecta un }
+        /*if(c == '}') leer_datos = 0; datos_legibles = 1; //comienza a tomar datos cuando detecta un {, deja de leer cuando detecta un }
         if(leer_datos){
             datos += c;
           }
-        if(c == "{") leer_datos = 1; datos_legibles = 0;*/
-
+        if(c == '{') leer_datos = 1; datos_legibles = 0;*/
         
-        
-        if (c == '\n') {  // Si se llega al final de la línea (nueva línea)
+        if (request.endsWith("\r\n\r\n")) {  // Si se llega al final de la línea (nueva línea)
           Serial.print(request);  // Muestra la línea en el monitor serie
-          if(request == "GET /datos") {
-            Serial.println("solicitud de datos recibida");
-            cliente.print("HTTP/1.1 200 OK\nContent-Type: text/plain\nConnection: close\n\n");
-            cliente.println(velocidad);
-            enviar_datos = 0;
-            
-            Serial.println("DATOS ENVIADOS!!!!!!!!!!!!!");
+          
+          if(request.indexOf("GET / ") >= 0) {
+            enviarPaginaHTML(cliente);
           }
-          else if(!pagina_enviada){
-            cliente.print("HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\n\n<!DOCTYPE HTML>\n<html>\n<h1>Datos del sensor</h1>\n<p>El valor del sensor es: <span id='data'>Esperando datos...</span></p>\n<script>\nfunction actualizarDatos() {\n  fetch('http://190.225.29.144/datos')\n    .then(response => response.text())\n    .then(data => document.getElementById('data').innerText = data);\n}\nsetInterval(actualizarDatos, 5000);\n</script>\n</html>\n");
-            cliente.stop();
-            pagina_enviada = 1;
+          else if(request.indexOf("GET /datos") >= 0) {
+            enviarDatosSensor(cliente);
           }
           request = "";  // Limpia la variable para la siguiente línea
+          break;
         }
       }
     }
     
-    //cliente.stop();  // Cierra la conexión con el client
-    //Serial.println("Cliente desconectado");
+    cliente.stop();// Cierra la conexión con el client
+    Serial.println("Cliente desconectado");
   }
+}
+
+// Función para enviar la página HTML
+void enviarPaginaHTML(EthernetClient& cliente) {
+  cliente.print("HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\n\n");
+  cliente.print("<!DOCTYPE HTML>\n<html>\n<h1>Datos del sensor</h1>\n");
+  cliente.print("<p>El valor del sensor es: <span id='data'>Esperando datos...</span></p>\n");
+  cliente.print("<script>\nfunction actualizarDatos() {\n");
+  cliente.print("  fetch('/datos')\n");
+  cliente.print("    .then(response => response.text())\n");
+  cliente.print("    .then(data => document.getElementById('data').innerText = data);\n");
+  cliente.print("}\nsetInterval(actualizarDatos, 5000);\n</script>\n</html>\n");
+  pagina_enviada = true;
+}
+
+// Función para enviar los datos del sensor
+void enviarDatosSensor(EthernetClient& cliente) {
+  cliente.print("HTTP/1.1 200 OK\nContent-Type: text/plain\nConnection: close\n\n");
+  cliente.println(velocidad);  // Envía el valor de la variable "velocidad"
+  Serial.println("Datos enviados");
 }
 
 
