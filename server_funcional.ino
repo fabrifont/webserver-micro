@@ -97,10 +97,12 @@ void loop() {
           
           // Verifica si es una solicitud a la página principal "/"
           if (request.indexOf("GET / ") >= 0) {
+            velocidad = 0;
             enviarPaginaHTML(cliente);
           }
           // Verifica si es una solicitud de datos "/datos"
           else if (request.indexOf("GET /datos") >= 0) {
+            velocidad += 10;
             enviarDatosSensor(cliente);
           }
 
@@ -123,7 +125,7 @@ void enviarPaginaHTML(EthernetClient& cliente) {
   cliente.print("  fetch('/datos')\n");
   cliente.print("    .then(response => response.text())\n");
   cliente.print("    .then(data => document.getElementById('data').innerText = data);\n");
-  cliente.print("}\nsetInterval(actualizarDatos, 5000);\n</script>\n</html>\n");
+  cliente.print("}\nsetInterval(actualizarDatos, 1000);\n</script>\n</html>\n");
 }
 
 // Función para enviar los datos del sensor
