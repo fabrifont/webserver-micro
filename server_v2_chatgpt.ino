@@ -12,7 +12,6 @@ bool leer_datos = 0;
 bool datos_legibles = 0;
 bool almacenar = 0;
 bool enviar_datos = 0;
-bool pagina_enviada = 0;
 String datos = "";
 String buffer_nombre = "";
 String buffer_valor = "";
@@ -49,7 +48,6 @@ void loop() {
   if (cliente) {  // Si hay un cliente conectado
     Serial.println("\nNuevo cliente conectado\n");
     request = "";
-    pagina_enviada = false;
     
     // Lee la solicitud del cliente
     while (cliente.connected()) {
@@ -126,7 +124,6 @@ void enviarPaginaHTML(EthernetClient& cliente) {
   cliente.print("    .then(response => response.text())\n");
   cliente.print("    .then(data => document.getElementById('data').innerText = data);\n");
   cliente.print("}\nsetInterval(actualizarDatos, 5000);\n</script>\n</html>\n");
-  pagina_enviada = true;
 }
 
 // Función para enviar los datos del sensor
