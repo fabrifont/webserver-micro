@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>Interfaz Web - Microprocesadores</title>
+    <style>
+      body {
+        background-color: lime;
+        font-family: 'Trebuchet MS';
+        height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .bloque {
+        background-color: white;
+        color: black;
+        font-size: 20px;
+        border-radius: 5px;
+        width: 50%;
+        height: 50%;
+        top: 50%;
+        left: 50%;
+        text-align: center;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='bloque'>
+      <h1>Datos del sensor</h1>
+      <p>Color: <span id='color'>Esperando datos...</span></p>
+      <p>Temperatura: <span id='temperatura'>Esperando datos...</span> °C</p>
+      <p>Humedad: <span id='humedad'>Esperando datos...</span> %</p>
+      <p>Velocidad: <span id='velocidad'>Esperando datos...</span> km/h</p>
+    </div>
+    <script>
+      function actualizarDatos() {
+        fetch('/datos')
+          .then(response => response.json())
+          .then(datos => {
+            document.getElementById('temperatura').innerText = datos.temperatura;
+            document.getElementById('humedad').innerText = datos.humedad;
+            document.getElementById('color').innerText = datos.color;
+            document.getElementById('velocidad').innerText = datos.velocidad;
+          })
+          .catch(error => console.error('Error al obtener los datos:', error));
+      }
+      setInterval(actualizarDatos, 1000);
+    </script>
+  </body>
+</html>
